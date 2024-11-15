@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carte Mapbox avec Trajets</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh; /* Assurez-vous que le body occupe toute la hauteur de la fenêtre */
+    }
+
+    #map {
+      width: 80%;
+      height: 100vh;
+    }
+
+    #sidebar {
+      width: 20%;
+      padding: 20px;
+      background-color: #f4f4f4;
+      overflow-y: auto; /* Activer le défilement vertical */
+      height: auto; /* La sidebar occupe toute la hauteur de la fenêtre */
+    }
+
+    h3 {
+      margin-top: 0;
+    }
+
+    /* Pour rendre la barre de défilement visible si nécessaire */
+    #segment-times {
+      max-height: calc(100vh - 40px); /* Réduit de 40px pour un peu de padding */
+    }
+  </style>
+</head>
+<body>
+
+  <div id="sidebar">
+    <h2>Méthode Exacte</h2>
+    <button onclick="location.href='gene.html'" style="margin-bottom: 20px;">Aller à la page gene</button>
+    <button onclick="location.href='tabou.html'" style="margin-bottom: 20px;">Aller à la page tabou</button>
+    <h3>Temps des segments</h3>
+    <div id="segment-times"></div>
+    
+  </div>
+
+  <div id="map"></div>
+
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+  <script>
+    // Initialiser Mapbox
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYnJ1bHV4NTciLCJhIjoiY20yNGlxa3J5MGRqaDJycDdtNWtuOW93eSJ9.CeA6FPvuDN_vxH5pYBfXWA';
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [2.397588, 46.452129], // Coordonnées de Paris (centrées par défaut)
+      zoom: 5.2
+    });
+
+    // Fonction pour générer une couleur hexadécimale aléatoire
+    function generateRandomColor() {
+      const letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
+    // Fonction pour convertir les heures en heures et minutes
+    function convertToHoursAndMinutes(decimalHours) {
+      const hours = Math.floor(decimalHours);
+      const minutes = Math.round((decimalHours - hours) * 60);
+      return `${hours} heure${hours > 1 ? 's' : ''} ${minutes} minute${minutes > 1 ? 's' : ''}`;
+    }
+
+    // Fonction pour générer l'itinéraire via l'API Optimized Trips de Mapbox
+    async function generateRoutes(route, truckIndex) {
+      const coordinates = route.coordinates.map(coord => coord); // Extraire les coordonnées de chaque trajet
+
+      // Générer une couleur unique pour ce trajet
+      const routeColor = generateRandomColor();
+
+      // Construire l'URL pour l'API Optimized Trips de Mapbox
+      const url = `https://api.mapbox.com/optimized-trips/v1/mapbox/driving/${coordinates.join(';')}?access_token=${mapboxgl.accessToken}&geometries=geojson&overview=full&steps=true`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data.trips && data.trips.length > 0) {
+          const routeGeo = data.trips[0].geometry;
+
+          // Afficher l'itinéraire sur la carte
+          map.addLayer({
+            id: `route-${truckIndex}`,
+            type: 'line',
+            source: {
+              type: 'geojson',
+              data: {
+                type: 'Feature',
+                geometry: routeGeo
+              }
+            },
+            layout: {
+              'line-join': 'round',
+              'line-cap': 'round'
+            },
+            paint: {
+              'line-color': routeColor, // Utiliser la couleur générée pour le trajet
+              'line-width': 3
+            }
+          });
+
+          // Ajouter les waypoints avec les popups pour chaque camion
+          const segmentTimesDiv = document.getElementById('segment-times');
+          segmentTimesDiv.innerHTML += `<h4>Camion ${route.vehicle}</h4>`;
+
+          // Extraire les noms des villes depuis l'ordre de chaque camion
+          const points = route.order.split(' -> ').map(city => city.trim());
+
+          // Ajouter un affichage pour le premier point (départ) avec un temps de 0
+          segmentTimesDiv.innerHTML += `<p>${points[0]}: 0 heures</p>`; // Point de départ avec un temps de 0
+
+          // Variable pour le temps cumulé des segments
+          let cumulativeTime = 0;
+
+          // Ajouter les points de l'itinéraire comme waypoints sur la carte
+          route.coordinates.forEach((coord, index) => {
+            const cityName = points[index] || `Point ${index + 1}`; // Nom de la ville
+            const popupContent = `${cityName} - Camion ${route.vehicle}`; // Contenu du popup
+
+            // Créer un marker pour chaque point, avec la couleur du trajet
+            const marker = new mapboxgl.Marker({ color: routeColor })
+              .setLngLat(coord)
+              .setPopup(new mapboxgl.Popup().setHTML(popupContent)) // Associer un popup au marker
+              .addTo(map);
+
+            // Ajouter le temps du segment à la variable cumulativeTime et afficher
+            if (route.segment_times && route.segment_times[index]) {
+              cumulativeTime += route.segment_times[index]; // Ajouter le temps du segment courant
+              const formattedTime = convertToHoursAndMinutes(cumulativeTime); // Convertir le temps cumulé
+              segmentTimesDiv.innerHTML += `<p>${points[index + 1] || `Point ${index + 2}`}: ${formattedTime}</p>`;
+            }
+          });
+
+        } else {
+          alert('Aucun itinéraire trouvé pour ce trajet.');
+        }
+      } catch (error) {
+        alert('Erreur lors de la génération des itinéraires.');
+        console.error('Erreur:', error);
+      }
+    }
+
+    // Charger et traiter le fichier JSON `route.json`
+    fetch('route_exact.json')
+      .then(response => response.json())
+      .then(routes => {
+        console.log('Données des routes:', routes); // Log pour vérifier les données
+        routes.forEach((route, index) => {
+          console.log(`Traitement du camion ${route.vehicle}`);
+          generateRoutes(route, index); // Appeler la fonction generateRoutes pour chaque véhicule
+        });
+      })
+      .catch(error => {
+        console.error('Erreur lors du chargement du fichier JSON:', error);
+      });
+  </script>
+
+</body>
+</html>

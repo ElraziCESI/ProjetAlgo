@@ -1,0 +1,195 @@
+[
+  {
+    "vehicle": 1,
+    "order": "Depot Paris -> st mard de vaux -> trevol -> auzas -> maisons -> rogliano -> chaux des crotenay -> hericourt -> Depot Paris",
+    "coordinates": [
+      [
+        2.2472902,
+        48.8621791
+      ],
+      [
+        4.672739168,
+        46.813487715
+      ],
+      [
+        3.316073994,
+        46.63727968
+      ],
+      [
+        0.8943728550000001,
+        43.174912217
+      ],
+      [
+        2.640431656,
+        42.929531435
+      ],
+      [
+        9.426060268,
+        42.972127086
+      ],
+      [
+        5.957121204,
+        46.66328688
+      ],
+      [
+        6.762227749,
+        47.569197714
+      ],
+      [
+        2.2472902,
+        48.8621791
+      ]
+    ],
+    "segment_times": [
+      3.23,
+      1.17,
+      4.77,
+      1.61,
+      6.13,
+      5.48,
+      1.31,
+      4.04
+    ],
+    "total_time": 27.75
+  },
+  {
+    "vehicle": 2,
+    "order": "Depot Paris -> la tombe -> vaux sur lunain -> Depot Paris",
+    "coordinates": [
+      [
+        2.2472902,
+        48.8621791
+      ],
+      [
+        3.09317412,
+        48.386672953
+      ],
+      [
+        2.956878876,
+        48.216495181
+      ],
+      [
+        2.2472902,
+        48.8621791
+      ]
+    ],
+    "segment_times": [
+      0.91,
+      0.24,
+      0.99
+    ],
+    "total_time": 2.13
+  },
+  {
+    "vehicle": 3,
+    "order": "Depot Paris -> fontaine sous preaux -> pissy poville -> Depot Paris",
+    "coordinates": [
+      [
+        2.2472902,
+        48.8621791
+      ],
+      [
+        1.168889652,
+        49.485713543
+      ],
+      [
+        1.001895493,
+        49.533770701
+      ],
+      [
+        2.2472902,
+        48.8621791
+      ]
+    ],
+    "segment_times": [
+      1.16,
+      0.15,
+      1.3
+    ],
+    "total_time": 2.61
+  },
+  {
+    "vehicle": 4,
+    "order": "Depot Paris -> arques la bataille -> pihem -> Depot Paris",
+    "coordinates": [
+      [
+        2.2472902,
+        48.8621791
+      ],
+      [
+        1.137815968,
+        49.882469559
+      ],
+      [
+        2.212245781,
+        50.675948524
+      ],
+      [
+        2.2472902,
+        48.8621791
+      ]
+    ],
+    "segment_times": [
+      1.54,
+      1.3,
+      2.24
+    ],
+    "total_time": 5.08
+  },
+  {
+    "vehicle": 5,
+    "order": "Depot Paris -> sainville -> ladon -> Depot Paris",
+    "coordinates": [
+      [
+        2.2472902,
+        48.8621791
+      ],
+      [
+        1.881545726,
+        48.415502379
+      ],
+      [
+        2.526169254,
+        48.00947309
+      ],
+      [
+        2.2472902,
+        48.8621791
+      ]
+    ],
+    "segment_times": [
+      0.63,
+      0.73,
+      1.08
+    ],
+    "total_time": 2.44
+  },
+  {
+    "vehicle": 6,
+    "order": "Depot Paris -> herin -> st remy en bouzemont st genest -> Depot Paris",
+    "coordinates": [
+      [
+        2.2472902,
+        48.8621791
+      ],
+      [
+        3.448511285,
+        50.358274584
+      ],
+      [
+        4.64925753,
+        48.613268494
+      ],
+      [
+        2.2472902,
+        48.8621791
+      ]
+    ],
+    "segment_times": [
+      2.08,
+      2.36,
+      1.98
+    ],
+    "total_time": 6.43
+  }
+]
